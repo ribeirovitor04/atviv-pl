@@ -31,10 +31,10 @@ public class ControleCliente {
 
 	@GetMapping("/cliente/{id}")
 	public ResponseEntity<Cliente> obterCliente(@PathVariable Long id) {
-		Cliente cliente = repositorio.findById(id).get();
+		Cliente cliente = repositorio.findById(id).orElse(null);
 		if (cliente != null) {
 			hateoas.adicionarLink(cliente);
-			return new ResponseEntity<Cliente>(cliente, HttpStatus.FOUND);
+			return new ResponseEntity<Cliente>(cliente, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<Cliente>(HttpStatus.NOT_FOUND);
 		}
@@ -44,7 +44,7 @@ public class ControleCliente {
 	public ResponseEntity<List<Cliente>> obterClientes() {
 		List<Cliente> clientes = repositorio.findAll();
 		hateoas.adicionarLink(clientes);
-		return new ResponseEntity<List<Cliente>>(clientes, HttpStatus.FOUND);
+		return new ResponseEntity<List<Cliente>>(clientes, HttpStatus.OK);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -74,11 +74,7 @@ public class ControleCliente {
 	@DeleteMapping("/cliente/excluir")
 	public ResponseEntity<?> excluirCliente(@RequestBody Cliente exclusao) {
 		Cliente cliente = repositorio.getById(exclusao.getId());
-		if (cliente == null) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} else {
-			repositorio.delete(cliente);
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
+		repositorio.delete(cliente);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
